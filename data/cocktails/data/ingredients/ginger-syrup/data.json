@@ -1,0 +1,52 @@
+{
+  "_id": "ginger-syrup_116",
+  "_parent_id": "syrups_942",
+  "name": "Ginger syrup",
+  "strength": 0,
+  "description": "Syrup infused with ginger root.\n\nThis ginger syrup is fantastic in cocktails, but it also makes an out-of-this-world ginger ale. To make ginger ale, simply fill an ice-filled glass a third of the way with the syrup, top with soda water and a squeeze of lime, stir and enjoy.",
+  "origin": "Worldwide",
+  "color": "#c6972c",
+  "category": "Syrups",
+  "created_at": null,
+  "updated_at": null,
+  "images": [
+    {
+      "uri": "file:///ginger-syrup.png",
+      "sort": 1,
+      "placeholder_hash": "9BiGHQA8aneAeHRpp3d/iPLGCCiHd4d3eA",
+      "copyright": "Monin"
+    }
+  ],
+  "ingredient_parts": [
+    {
+      "_id": "ginger_8",
+      "name": "Ginger",
+      "strength": 0,
+      "description": "Ginger root used as a spice",
+      "origin": null,
+      "category": "Fruits and vegetables"
+    },
+    {
+      "_id": "sugar_16",
+      "name": "Sugar",
+      "strength": 0,
+      "description": "White sugar",
+      "origin": null,
+      "category": "Sweeteners"
+    },
+    {
+      "_id": "water_67",
+      "name": "Water",
+      "strength": 0,
+      "description": "It's water.",
+      "origin": "Worldwide",
+      "category": "Beverages"
+    }
+  ],
+  "prices": [],
+  "calculator_id": null,
+  "sugar_g_per_ml": null,
+  "acidity": null,
+  "distillery": null,
+  "units": "ml"
+}
