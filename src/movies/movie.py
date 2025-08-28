@@ -6,11 +6,6 @@ import os
 from dotenv import load_dotenv
 
 
-class Rating(BaseModel):
-    Source: str
-    Value: str
-
-
 class Movie(BaseModel):
     title: str
     year: str
@@ -24,19 +19,7 @@ class Movie(BaseModel):
     plot: str
     language: str
     country: str
-    awards: str
-    poster: str
-    ratings: list[Rating]
-    metascore: str
     imdb_rating: str
-    imdb_votes: str
-    imdb_id: str
-    type: str
-    dvd: str
-    box_office: str
-    production: str
-    website: str
-    response: str
 
     def __str__(self) -> str:
         return (
@@ -52,19 +35,7 @@ class Movie(BaseModel):
             f"Plot: {self.plot}\n"
             f"Language: {self.language}\n"
             f"Country: {self.country}\n"
-            f"Awards: {self.awards}\n"
-            f"Poster: {self.poster}\n"
-            f"Ratings: {', '.join([f'{r.Source}: {r.Value}' for r in self.ratings])}\n"
-            f"Metascore: {self.metascore}\n"
             f"IMDB Rating: {self.imdb_rating}\n"
-            f"IMDB Votes: {self.imdb_votes}\n"
-            f"IMDB ID: {self.imdb_id}\n"
-            f"Type: {self.type}\n"
-            f"DVD: {self.dvd}\n"
-            f"Box Office: {self.box_office}\n"
-            f"Production: {self.production}\n"
-            f"Website: {self.website}\n"
-            f"Response: {self.response}"
         )
 
 
@@ -106,8 +77,10 @@ class MovieSearch:
         response = requests.get(url, timeout=10)
         if response.status_code == http.HTTPStatus.OK:
             data = response.json()
-            # Map API fields to Movie fields
-            ratings = [Rating(**r) for r in data.get("Ratings", [])]
+            if data.get("Response") == "False":
+                print("Error: Movie not found.")
+                return None
+
             movie = Movie(
                 title=data.get("Title", ""),
                 year=data.get("Year", ""),
@@ -121,19 +94,7 @@ class MovieSearch:
                 plot=data.get("Plot", ""),
                 language=data.get("Language", ""),
                 country=data.get("Country", ""),
-                awards=data.get("Awards", ""),
-                poster=data.get("Poster", ""),
-                ratings=ratings,
-                metascore=data.get("Metascore", ""),
                 imdb_rating=data.get("imdbRating", ""),
-                imdb_votes=data.get("imdbVotes", ""),
-                imdb_id=data.get("imdbID", ""),
-                type=data.get("Type", ""),
-                dvd=data.get("DVD", ""),
-                box_office=data.get("BoxOffice", ""),
-                production=data.get("Production", ""),
-                website=data.get("Website", ""),
-                response=data.get("Response", ""),
             )
             return movie
         else:
