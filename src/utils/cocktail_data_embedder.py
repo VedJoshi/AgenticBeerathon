@@ -21,9 +21,9 @@ def insert_cocktail(cur, cocktail):
     cur.execute(
         """
         INSERT INTO cocktails (
-            _id, name, instructions, created_at, updated_at, description, source, garnish, abv, tags, glass, method, utensils, images, ingredients, parent_cocktail_id, year
+            id, name, instructions, created_at, updated_at, description, source, garnish, abv, glass, method, year
         ) VALUES (
-            %(id)s, %(name)s, %(instructions)s, %(created_at)s, %(updated_at)s, %(description)s, %(source)s, %(garnish)s, %(abv)s, %(tags)s, %(glass)s, %(method)s, %(utensils)s, %(images)s, %(ingredients)s, %(parent_cocktail_id)s, %(year)s
+            %(id)s, %(name)s, %(instructions)s, %(created_at)s, %(updated_at)s, %(description)s, %(source)s, %(garnish)s, %(abv)s, %(glass)s, %(method)s, %(year)s
         ) ON CONFLICT DO NOTHING;
     """,
         {
@@ -36,63 +36,73 @@ def insert_cocktail(cur, cocktail):
             "source": cocktail.get("source"),
             "garnish": cocktail.get("garnish"),
             "abv": cocktail.get("abv"),
-            "tags": cocktail.get("tags"),
             "glass": cocktail.get("glass"),
             "method": cocktail.get("method"),
-            "utensils": cocktail.get("utensils"),
-            "images": json.dumps(cocktail.get("images")),
-            "ingredients": json.dumps(cocktail.get("ingredients")),
-            "parent_cocktail_id": cocktail.get("parent_cocktail_id"),
             "year": cocktail.get("year"),
         },
     )
 
 
 def insert_ingredient(cur, ingredient):
-    cur.execute(
-        """
-        INSERT INTO ingredients (
-            _id, _parent_id, name, strength, description, origin, color, category, created_at, updated_at, images, ingredient_parts, prices, calculator_id, sugar_g_per_ml, acidity, distillery, units
-        ) VALUES (
-            %(id)s, %(parent_id)s, %(name)s, %(strength)s, %(description)s, %(origin)s, %(color)s, %(category)s, %(created_at)s, %(updated_at)s, %(images)s, %(ingredient_parts)s, %(prices)s, %(calculator_id)s, %(sugar_g_per_ml)s, %(acidity)s, %(distillery)s, %(units)s
-        ) ON CONFLICT DO NOTHING;
-    """,
-        {
-            "id": ingredient.get("_id"),
-            "parent_id": ingredient.get("_parent_id"),
-            "name": ingredient.get("name"),
-            "strength": ingredient.get("strength"),
-            "description": ingredient.get("description"),
-            "origin": ingredient.get("origin"),
-            "color": ingredient.get("color"),
-            "category": ingredient.get("category"),
-            "created_at": ingredient.get("created_at"),
-            "updated_at": ingredient.get("updated_at"),
-            "images": json.dumps(ingredient.get("images")),
-            "ingredient_parts": json.dumps(ingredient.get("ingredient_parts")),
-            "prices": json.dumps(ingredient.get("prices")),
-            "calculator_id": ingredient.get("calculator_id"),
-            "sugar_g_per_ml": ingredient.get("sugar_g_per_ml"),
-            "acidity": ingredient.get("acidity"),
-            "distillery": ingredient.get("distillery"),
-            "units": ingredient.get("units"),
-        },
-    )
+    pass
+    # cur.execute(
+    #     ap
+    #     """
+    #     INSERT INTO ingredients (
+    #         id, _parent_id, name, strength, description, origin, color, category, created_at, updated_at, images, ingredient_parts, prices, calculator_id, sugar_g_per_ml, acidity, distillery, units
+    #     ) VALUES (
+    #         %(id)s, %(parent_id)s, %(name)s, %(strength)s, %(description)s, %(origin)s, %(color)s, %(category)s, %(created_at)s, %(updated_at)s, %(images)s, %(ingredient_parts)s, %(prices)s, %(calculator_id)s, %(sugar_g_per_ml)s, %(acidity)s, %(distillery)s, %(units)s
+    #     ) ON CONFLICT DO NOTHING;
+    # """,
+    #     {
+    #         "id": ingredient.get("_id"),
+    #         "parent_id": ingredient.get("_parent_id"),
+    #         "name": ingredient.get("name"),
+    #         "strength": ingredient.get("strength"),
+    #         "description": ingredient.get("description"),
+    #         "origin": ingredient.get("origin"),
+    #         "color": ingredient.get("color"),
+    #         "category": ingredient.get("category"),
+    #         "created_at": ingredient.get("created_at"),
+    #         "updated_at": ingredient.get("updated_at"),
+    #         "images": json.dumps(ingredient.get("images")),
+    #         "ingredient_parts": json.dumps(ingredient.get("ingredient_parts")),
+    #         "prices": json.dumps(ingredient.get("prices")),
+    #         "calculator_id": ingredient.get("calculator_id"),
+    #         "sugar_g_per_ml": ingredient.get("sugar_g_per_ml"),
+    #         "acidity": ingredient.get("acidity"),
+    #         "distillery": ingredient.get("distillery"),
+    #         "units": ingredient.get("units"),
+    #     },
+    # )
 
 
 def main():
-    conn = psycopg2.connect("dbname=agenticbeerathon")
+    conn = psycopg2.connect(
+        host="localhost",
+        database="postgres",
+        user="postgres",
+        password="ved123"
+    )
     cur = conn.cursor()
 
     for path in get_all_data_json_paths(COCKTAILS_DIR):
-        with open(path) as f:
-            cocktail = json.load(f)
-            insert_cocktail(cur, cocktail)
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                cocktail = json.load(f)
+                insert_cocktail(cur, cocktail)
+        except (json.JSONDecodeError, FileNotFoundError, IOError, UnicodeDecodeError) as e:
+            print(f"Error loading cocktail file {path}: {e}")
+            continue
 
-    for path in get_all_data_json_paths(INGREDIENTS_DIR):
-        with open(path) as f:
-            ingredient = json.load(f)
-            insert_ingredient(cur, ingredient)
+    # for path in get_all_data_json_paths(INGREDIENTS_DIR):
+    #     try:
+    #         with open(path, 'r', encoding='utf-8') as f:
+    #             ingredient = json.load(f)
+    #             insert_ingredient(cur, ingredient)
+    #     except (json.JSONDecodeError, FileNotFoundError, IOError, UnicodeDecodeError) as e:
+    #         print(f"Error loading ingredient file {path}: {e}")
+    #         continue
 
     conn.commit()
     cur.close()

@@ -1,0 +1,22 @@
+{
+  "metadataAttributes": {
+    "glass": "string",
+    "method": "string",
+    "abv": "number",
+    "tags": "string_list",
+    "origin_spirits": "string",
+    "ingredient_count": "number",
+    "has_alcohol": "boolean",
+    "year": "string",
+    "created_at": "string"
+  },
+  "contentAttributes": [
+    "cocktail_id",
+    "name",
+    "description",
+    "instructions",
+    "ingredients_text",
+    "garnish",
+    "source"
+  ]
+}
