@@ -1,5 +1,9 @@
 /beer
 
+data/output/cocktails_knowledge_base.csv
+
+aws-strands-agent
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
