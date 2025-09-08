@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-Deployment utility for Clanker That Recommends Alcohol
+Simple deployment utility for Clanker That Recommends Alcohol
 """
 
-import argparse
 import os
-import subprocess
 import sys
 
 def check_dependencies():
@@ -15,7 +13,6 @@ def check_dependencies():
         import fastapi
         import uvicorn
         import pydantic
-        import dotenv
         print("✅ All dependencies are installed")
         return True
     except ImportError as e:
@@ -23,60 +20,28 @@ def check_dependencies():
         print("Run 'pip install -r requirements.txt' to install dependencies")
         return False
 
-def check_env():
-    """Check if environment variables are set"""
-    required_vars = ['AWS_REGION', 'AWS_ACCESS_KEY_ID', 'AWS_SECRET_ACCESS_KEY']
-    missing = [var for var in required_vars if not os.getenv(var)]
-    
-    if missing:
-        print(f"❌ Missing environment variables: {', '.join(missing)}")
-        print("Create a .env file with the required variables")
-        return False
-    
-    print("✅ All environment variables are set")
-    return True
-
-def deploy_local():
-    """Deploy locally with uvicorn"""
-    if not (check_dependencies() and check_env()):
-        return
-    
-    print("\n🚀 Deploying locally...")
-    print("Starting API server on http://localhost:8000")
-    
-    subprocess.run([sys.executable, "-m", "src.beer_clanker_bot.api"])
-
-def deploy_docker():
-    """Deploy with Docker"""
+def run_local():
+    """Run the API server locally"""
     if not check_dependencies():
         return
     
-    print("\n🐳 Building Docker image...")
-    subprocess.run(["docker", "build", "-t", "clanker-api", "."])
+    print("\n🚀 Starting API server locally...")
+    print("Server will be available at http://localhost:8000")
     
-    print("\n🚀 Running Docker container...")
-    subprocess.run([
-        "docker", "run", "-p", "8000:8000", 
-        "-e", f"AWS_REGION={os.getenv('AWS_REGION', 'us-east-1')}", 
-        "-e", f"AWS_ACCESS_KEY_ID={os.getenv('AWS_ACCESS_KEY_ID', '')}", 
-        "-e", f"AWS_SECRET_ACCESS_KEY={os.getenv('AWS_SECRET_ACCESS_KEY', '')}", 
-        "clanker-api"
-    ])
-
-def main():
-    """Main entry point"""
-    parser = argparse.ArgumentParser(description="Deploy Clanker That Recommends Alcohol")
-    parser.add_argument("--mode", choices=["local", "docker"], default="local", help="Deployment mode")
+    # Set environment for local development
+    os.environ.setdefault("CLANKER_ENVIRONMENT", "development")
+    os.environ.setdefault("CLANKER_DEBUG", "true")
     
-    args = parser.parse_args()
-    
-    print("🍸🎬 Clanker That Recommends Alcohol - Deployment")
-    print("=" * 60)
-    
-    if args.mode == "local":
-        deploy_local()
-    elif args.mode == "docker":
-        deploy_docker()
+    # Import and run the API
+    try:
+        from src.beer_clanker_bot.api import app
+        import uvicorn
+        uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+    except Exception as e:
+        print(f"❌ Failed to start server: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
-    main()
+    print("🍸🎬 Clanker That Recommends Alcohol - Local Development")
+    print("=" * 60)
+    run_local()

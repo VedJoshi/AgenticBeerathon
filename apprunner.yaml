@@ -3,12 +3,26 @@ runtime: python3
 build:
   commands:
     build:
+      - echo "Starting build process..."
       - pip install --upgrade pip
-      - pip install -r requirements.txt
+      - pip install --no-cache-dir -r requirements.txt
+      - echo "Build completed successfully"
 run:
-  command: python -m src.beer_clanker_bot.api
+  runtime-version: 3.11
+  command: python startup.py
   network:
     port: 8000
+    env: PORT
   env:
     - name: PORT
       value: "8000"
+    - name: CLANKER_HOST
+      value: "0.0.0.0"
+    - name: CLANKER_PORT
+      value: "8000"
+    - name: CLANKER_ENVIRONMENT
+      value: "production"
+    - name: CLANKER_LOG_LEVEL
+      value: "INFO"
+    - name: AWS_REGION
+      value: "us-east-1"

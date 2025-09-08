@@ -205,7 +205,7 @@ if __name__ == "__main__":
     logger.info(f"Debug mode: {config.debug}")
     
     uvicorn.run(
-        "api:app" if config.environment == "production" else app,
+        app,
         host=config.host,
         port=config.port,
         reload=config.debug,
