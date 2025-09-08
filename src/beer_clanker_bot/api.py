@@ -46,9 +46,14 @@ if not config.debug:
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"] if config.debug else [],  # Configure properly for production
+    allow_origins=[
+        "https://beerathon.streamlit.app",
+        "http://localhost:8501",  # For local testing
+        "http://localhost:3000",  # For local frontend dev
+        "*" if config.debug else "https://beerathon.streamlit.app"
+    ],
     allow_credentials=True,
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
