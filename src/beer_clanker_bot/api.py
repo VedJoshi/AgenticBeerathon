@@ -89,8 +89,20 @@ def get_recommender() -> ClankerRecommender:
     """Dependency to get the recommender instance"""
     global _recommender
     if _recommender is None:
-        logger.info("Initializing ClankerRecommender...")
-        _recommender = ClankerRecommender()
+        try:
+            logger.info("Initializing ClankerRecommender...")
+            _recommender = ClankerRecommender()
+            logger.info("ClankerRecommender initialized successfully")
+        except Exception as e:
+            logger.error(f"Failed to initialize ClankerRecommender: {str(e)}")
+            raise HTTPException(
+                status_code=503,
+                detail=ErrorResponse(
+                    error="Service initialization failed",
+                    error_code="INIT_ERROR",
+                    details={"message": "Unable to initialize AI recommendation service"}
+                ).dict()
+            )
     return _recommender
 
 @app.post("/recommend-drink/", response_model=ClankerResponse)
@@ -160,9 +172,7 @@ async def health_check() -> HealthResponse:
     Used by load balancers and monitoring systems.
     """
     try:
-        # Test recommender initialization
-        get_recommender()
-        
+        # Basic health check without initializing AWS services
         return HealthResponse(
             status="healthy",
             service="Clanker That Recommends Alcohol",
@@ -180,6 +190,29 @@ async def health_check() -> HealthResponse:
                 timestamp=datetime.now().isoformat()
             ).dict()
         )
+
+@app.get("/health/aws")
+async def aws_health_check():
+    """
+    🔧 AWS connectivity health check
+    Tests if AWS services are accessible and properly configured
+    """
+    try:
+        # Test AWS connection by initializing recommender
+        get_recommender()
+        return {
+            "status": "healthy",
+            "aws_connection": "active",
+            "timestamp": datetime.now().isoformat()
+        }
+    except Exception as e:
+        logger.error(f"AWS health check failed: {str(e)}")
+        return {
+            "status": "unhealthy",
+            "aws_connection": "failed",
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
+        }
 
 @app.get("/")
 async def root():

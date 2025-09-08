@@ -12,16 +12,16 @@ os.environ.setdefault("CLANKER_ENVIRONMENT", "production")
 os.environ.setdefault("CLANKER_HOST", "0.0.0.0")
 os.environ.setdefault("CLANKER_PORT", "8000")
 
-# Add src to path if not already there
-src_path = os.path.join(os.path.dirname(__file__), 'src')
-if src_path not in sys.path:
-    sys.path.insert(0, src_path)
-
 def main():
     """Main entry point for production deployment"""
     try:
+        # Add src to Python path
+        src_path = os.path.join(os.path.dirname(__file__), 'src')
+        if src_path not in sys.path:
+            sys.path.insert(0, src_path)
+        
         # Import the API module
-        from src.beer_clanker_bot.api import app
+        from beer_clanker_bot.api import app
         import uvicorn
         
         # Get configuration
